@@ -36,4 +36,4 @@ To run this project locally, follow the steps below:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/cumulative-part-2.git
+git clone https://github.com/Coderohitk/CumulativePart2.git
