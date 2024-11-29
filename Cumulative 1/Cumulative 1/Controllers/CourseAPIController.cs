@@ -83,11 +83,11 @@ namespace Cumulative_1.Controllers
         /// GET api/Course/FindCourse/1 -> {"courseId":1,"coursecode":"http5101","teacherid":1,"startdate":"2018-09-04T00:00:00","finishdate":"2018-12-14T00:00:00","coursename":"Web Application Development"}
         /// </example>
         [HttpGet]
-            [Route(template: "FindCourse/{id}")]
-            public Course FindCourse(int id)
-            {
+        [Route(template: "FindCourse/{id}")]
+        public Course FindCourse(int id)
+        {
 
-                Course SelectedCourse = new Course();
+            Course SelectedCourse = new Course();
 
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
@@ -117,67 +117,93 @@ namespace Cumulative_1.Controllers
                     }
                 }
             }
-                return SelectedCourse;
-            }
+            return SelectedCourse;
+        }
         /// <summary>
-        /// 
+        /// Adds a new course to the database.
         /// </summary>
-        /// <param name="CourseData"></param>
-        /// <returns></returns>
+        /// <param name="CourseData">The course object containing course code, teacher ID, start date, finish date, and course name.</param>
+        /// <example>
+        /// POST: api/Student/AddCourse
+        /// Headers: Content-Type: application/json
+        /// Request Body:
+        /// {
+        ///     "coursecode": "CS101",
+        ///     "teacherid": 5,
+        ///     "startdate": "2024-01-15T00:00:00",
+        ///     "finishdate": "2024-06-01T00:00:00",
+        ///     "coursename": "Introduction to Computer Science"
+        /// }
+        /// Response:
+        /// 7  // Returns the inserted Course ID
+        /// </example>
+        /// <returns>
+        /// The ID of the newly inserted course if successful. Returns 0 if unsuccessful.
+        /// </returns>
         [HttpPost(template: "AddCourse")]
         public int AddCourse([FromBody] Course CourseData)
         {
-            // 'using' will close the connection after the code executes
+            // 'using' ensures the connection is closed after the code executes
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
                 Connection.Open();
-                //Establish a new command (query) for our database
+
+                // Establish a new command (query) for our database
                 MySqlCommand Command = Connection.CreateCommand();
 
-                // CURRENT_DATE() for the author join date in this context
-                // Other contexts the join date may be an input criteria!
-                Command.CommandText = "INSERT INTO courses(coursecode,teacherid,startdate,finishdate,coursename) VALUES(@coursecode,@teacherid,@startdate,@finishdate,@coursename)";
+                Command.CommandText = "INSERT INTO courses(coursecode, teacherid, startdate, finishdate, coursename) " +
+                                      "VALUES(@coursecode, @teacherid, @startdate, @finishdate, @coursename)";
+
+                // Adding parameters to prevent SQL injection
                 Command.Parameters.AddWithValue("@coursecode", CourseData.coursecode);
                 Command.Parameters.AddWithValue("@teacherid", CourseData.teacherid);
                 Command.Parameters.AddWithValue("@startdate", CourseData.startdate);
                 Command.Parameters.AddWithValue("@finishdate", CourseData.finishdate);
                 Command.Parameters.AddWithValue("@coursename", CourseData.coursename);
 
+                // Execute the query and return the ID of the newly inserted course
                 Command.ExecuteNonQuery();
-
                 return Convert.ToInt32(Command.LastInsertedId);
-
             }
-            // if failure
+            // Return 0 if the operation fails
             return 0;
         }
         /// <summary>
-        /// 
+        /// Deletes a course from the database based on its ID.
         /// </summary>
-        /// <param name="courseId"></param>
-        /// <returns></returns>
+        /// <param name="courseId">The ID of the course to be deleted.</param>
+        /// <example>
+        /// DELETE: api/Student/DeleteCourse/3
+        /// Response:
+        /// 1  // Returns the number of rows affected (1 if successful)
+        /// </example>
+        /// <returns>
+        /// The number of rows affected. Returns 0 if the deletion is unsuccessful.
+        /// </returns>
         [HttpDelete(template: "DeleteCourse/{courseId}")]
         public int DeleteCourse(int courseId)
         {
-            // 'using' will close the connection after the code executes
+            // 'using' ensures the connection is closed after the code executes
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
                 Connection.Open();
-                //Establish a new command (query) for our database
+
+                // Establish a new command (query) for our database
                 MySqlCommand Command = Connection.CreateCommand();
 
-
-                Command.CommandText = "delete from courses where courseid=@id";
+                Command.CommandText = "DELETE FROM courses WHERE courseid = @id";
                 Command.Parameters.AddWithValue("@id", courseId);
-                return Command.ExecuteNonQuery();
 
+                // Execute the query and return the number of rows affected
+                return Command.ExecuteNonQuery();
             }
-            // if failure
+            // Return 0 if the operation fails
             return 0;
         }
 
+
     }
 
 
-    }
+}
 

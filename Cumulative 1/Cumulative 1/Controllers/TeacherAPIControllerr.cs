@@ -44,10 +44,10 @@ namespace Cumulative_1.Controllers
                 Connection.Open();
                 MySqlCommand Command = Connection.CreateCommand();
 
-                
+
                 string query = "SELECT * FROM teachers LEFT JOIN courses ON teachers.teacherid = courses.teacherid";
 
-                
+
                 bool hasConditions = false;
                 if (StartDate.HasValue && EndDate.HasValue)
                 {
@@ -84,7 +84,7 @@ namespace Cumulative_1.Controllers
                                 TeacherHireDate = TeacherHireDate,
                                 TeacherSalary = TeacherSalary,
                                 TeacherEmpNu = TeacherEmpNu,
-                              
+
                             };
                         }
                     }
@@ -116,45 +116,35 @@ namespace Cumulative_1.Controllers
         [Route(template: "FindTeacher/{id}")]
         public Teacher FindTeacher(int id)
         {
+            Teacher selectedTeacher = null;
 
-            
-            Teacher SelectedTeacher = new Teacher();
             using (MySqlConnection Connection = _context.AccessDatabase())
             {
                 Connection.Open();
                 MySqlCommand Command = Connection.CreateCommand();
-                 Command.CommandText = "SELECT teachers.*, courses.courseName FROM courses INNER JOIN teachers ON teachers.teacherId = courses.teacherId WHERE teachers.teacherId = @id";
+                Command.CommandText = "SELECT * FROM teachers WHERE teacherid=@id";
                 Command.Parameters.AddWithValue("@id", id);
 
                 using (MySqlDataReader ResultSet = Command.ExecuteReader())
                 {
-                    while (ResultSet.Read())
+                    if (ResultSet.Read())  // Only if there is a result
                     {
-                        int Id = Convert.ToInt32(ResultSet["teacherid"]);
-                        string FirstName = ResultSet["teacherfname"].ToString();
-                        string LastName = ResultSet["teacherlname"].ToString();
-                        string TeacherEmpNu = ResultSet["employeenumber"].ToString();
-
-                        DateTime TeacherHireDate = Convert.ToDateTime(ResultSet["hiredate"]);
-                        decimal TeacherSalary = Convert.ToDecimal(ResultSet["salary"]);
-                        string CourseName = ResultSet["coursename"].ToString();
-                        if (SelectedTeacher.TeacherId == 0)
+                        selectedTeacher = new Teacher
                         {
-
-                            SelectedTeacher.TeacherId = Id;
-                            SelectedTeacher.TeacherFName = FirstName;
-                            SelectedTeacher.TeacherLName = LastName;
-                            SelectedTeacher.TeacherSalary = TeacherSalary;
-                            SelectedTeacher.TeacherHireDate = TeacherHireDate;
-                            SelectedTeacher.TeacherEmpNu = TeacherEmpNu;
-                           
-                        }
-                        
+                            TeacherId = Convert.ToInt32(ResultSet["teacherid"]),
+                            TeacherFName = ResultSet["teacherfname"].ToString(),
+                            TeacherLName = ResultSet["teacherlname"].ToString(),
+                            TeacherEmpNu = ResultSet["employeenumber"].ToString(),
+                            TeacherHireDate = Convert.ToDateTime(ResultSet["hiredate"]),
+                            TeacherSalary = Convert.ToDecimal(ResultSet["salary"])
+                        };
                     }
                 }
             }
-            return SelectedTeacher;
+
+            return selectedTeacher;  // Will return null if not found.
         }
+
         /// <summary>
         /// Retrieves a list of courses taught by a specific teacher, identified by their teacher ID.
         /// </summary>
@@ -189,7 +179,7 @@ namespace Cumulative_1.Controllers
                     {
                         string courseName = ResultSet["CourseName"].ToString();
                         int Id = Convert.ToInt32(ResultSet["teacherid"]);
-                        
+
 
                         courses.Add(courseName);
                     }
@@ -199,9 +189,22 @@ namespace Cumulative_1.Controllers
             return courses;
         }
         /// <summary>
-        /// 
+        /// Adds a teacher to the database
         /// </summary>
-        /// <param name="Teacherdata"></param>
+        /// <param name="Teacherdata">Teacher Object</param>
+        /// <example>
+        /// POST: api/Teacher/AddTeacher
+        /// Headers: Content-Type: application/json
+        /// Request Body:
+        /// {
+        ///   "teacherId": 20,
+        ///    "teacherFName": "Rohit",
+        ///    "teacherLName": "Kumar",
+        ///    "teacherHireDate": "2024-11-29T04:13:56.436Z",
+        ///    "teacherSalary": 80,
+        ///    "teacherEmpNu": "N0178"
+        /// } -> 20
+        /// </example>
         /// <returns></returns>
         [HttpPost(template: "AddTeacher")]
         public int AddTeacher([FromBody] Teacher Teacherdata)
@@ -212,9 +215,6 @@ namespace Cumulative_1.Controllers
                 Connection.Open();
                 //Establish a new command (query) for our database
                 MySqlCommand Command = Connection.CreateCommand();
-
-                // CURRENT_DATE() for the author join date in this context
-                // Other contexts the join date may be an input criteria!
                 Command.CommandText = "INSERT INTO teachers(teacherfname,teacherlname,hiredate,employeenumber,salary) VALUES(@teacherfname,@teacherlname,@hiredate,@TeacherEmpNu,@salary)";
                 Command.Parameters.AddWithValue("@teacherfname", Teacherdata.TeacherFName);
                 Command.Parameters.AddWithValue("@teacherlname", Teacherdata.TeacherLName);
@@ -229,12 +229,19 @@ namespace Cumulative_1.Controllers
             }
             // if failure
             return 0;
-            }
+        }
         /// <summary>
-        /// 
+        /// Deletes a teacher from the database by their ID
         /// </summary>
-        /// <param name="TeacherId"></param>
-        /// <returns></returns>
+        /// <param name="TeacherId">The ID of the teacher to be deleted</param>
+        /// <example>
+        /// DELETE: api/Teacher/DeleteTeacher/1
+        /// -> 1
+        /// </example>
+        /// <returns>
+        /// The number of rows affected (1 if successful, 0 if no rows were deleted)
+        /// </returns>
+
         [HttpDelete(template: "DeleteTeacher/{TeacherId}")]
         public int DeleteTeacher(int TeacherId)
         {
@@ -255,4 +262,4 @@ namespace Cumulative_1.Controllers
             return 0;
         }
     }
-}   
+}

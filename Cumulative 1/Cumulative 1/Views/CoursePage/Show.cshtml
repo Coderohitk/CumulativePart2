@@ -2,38 +2,43 @@
 
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f0f2f5;
         margin: 0;
         padding: 20px;
+        line-height: 1.6;
     }
 
     .container {
-        max-width: 900px;
-        margin: auto;
+        max-width: 800px;
+        margin: 40px auto;
         background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
     }
 
     h1 {
-        text-align: center;
         color: #007bff;
-        font-size: 24px;
-        margin-bottom: 20px;
+        font-size: 28px;
+        margin-bottom: 30px;
+        letter-spacing: 1px;
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        margin: auto;
+        margin: 20px 0;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     th, td {
-        padding: 12px;
+        padding: 15px;
         border: 1px solid #ddd;
-        text-align: left;
+        text-align: center;
         font-size: 16px;
     }
 
@@ -41,27 +46,46 @@
         background-color: #007bff;
         color: white;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
     }
 
     td {
         color: #333;
+        background-color: #fdfdfd;
     }
 
     tr:nth-child(even) {
-        background-color: #f2f2f2;
+        background-color: #f9f9f9;
     }
 
     tr:hover {
-        background-color: #e9e9e9;
+        background-color: #f1f1f1;
+        cursor: pointer;
     }
 
-    .footer {
+    .button-container {
+        margin-top: 30px;
         text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-        color: #777;
     }
+
+    .btn {
+        padding: 12px 25px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn:hover {
+            background-color: #c82333;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+            transform: translateY(-2px);
+        }
 </style>
 
 <div class="container">
@@ -87,4 +111,10 @@
             </tr>
         </tbody>
     </table>
+
+    <div class="button-container">
+        <form method="get" action="/CoursePage/DeleteConfirm/@Model.courseId">
+            <button type="submit" class="btn">Delete Course</button>
+        </form>
+    </div>
 </div>

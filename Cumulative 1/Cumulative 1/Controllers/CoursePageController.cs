@@ -7,36 +7,44 @@ namespace Cumulative_1.Controllers
     {
         private readonly CourseAPIController _api;
 
+        // Constructor to initialize the Course API controller
         public CoursePageController(CourseAPIController api)
         {
             _api = api;
         }
 
+        // Displays a list of all courses
         public IActionResult List()
         {
             List<Course> Courses = _api.ListCourse();
             return View(Courses);
         }
+
+        // Displays the details of a specific course
         public IActionResult Show(int id)
         {
             Course SelectedCourse = _api.FindCourse(id);
             return View(SelectedCourse);
         }
+
+        // Displays the form to create a new course
         [HttpGet]
-        public IActionResult New(int id)
+        public IActionResult New()
         {
             return View();
         }
 
-        // POST: AuthorPage/Create
+        // Handles the creation of a new course
         [HttpPost]
         public IActionResult Create(Course NewCourse)
         {
             int courseId = _api.AddCourse(NewCourse);
 
-            // redirects to "Show" action on "Author" cotroller with id parameter supplied
+            // Redirects to the "Show" action with the ID of the newly created course
             return RedirectToAction("Show", new { id = courseId });
         }
+
+        // Displays a confirmation view to delete a specific course
         [HttpGet]
         public IActionResult DeleteConfirm(int id)
         {
@@ -44,12 +52,13 @@ namespace Cumulative_1.Controllers
             return View(SelectedCourse);
         }
 
-        // POST: AuthorPage/Delete/{id}
+        // Handles the deletion of a course
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            int courseId = _api.DeleteCourse(id);
-            // redirects to list action
+            int courseId=_api.DeleteCourse(id);
+
+            // Redirects to the "List" action after successful deletion
             return RedirectToAction("List");
         }
     }
